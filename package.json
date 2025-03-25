@@ -1,0 +1,21 @@
+{
+  "name": "MAD9124-CRAPR-API",
+  "version": "1.0.0",
+  "description": "Restful API web service ",
+  "main": "src/index.js",
+  "repository": "https://github.com/path0064/MAD9124-CRAPR-API.git",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "author": "Jowairia and Nada",
+  "license": "MIT",
+  "dependencies": {
+    "debug": "^4.4.0",
+    "express": "^4.21.2",
+    "mongodb": "^6.15.0",
+    "mongoose": "^8.13.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
