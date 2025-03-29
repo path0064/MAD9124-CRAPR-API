@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Crap = require("./crapSchema");
 
 const connect = async () => {
   try {
@@ -11,4 +12,5 @@ const connect = async () => {
 
 module.exports = {
   connect,
+  Crap,
 };

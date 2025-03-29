@@ -47,12 +47,13 @@ const crapSchema = new mongoose.Schema(
 );
 
 const Crap = mongoose.model("Crap", crapSchema);
+
 const newCrap = new Crap({
-  court: { name: "PillowFightz", count: 2 },
   title: "bag",
   description: "lorem ipsem lorem ipsem lorem ipsem lorem ipsem",
   images: "https://picsum.photos/200",
   status: "null",
 });
-await newCrap.save();
+newCrap.save();
+
 module.exports = Crap;
