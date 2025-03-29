@@ -1,5 +1,5 @@
 {
-  "name": "MAD9124-CRAPR-API",
+  "name": "mad9124-crapr-api",
   "version": "1.0.0",
   "description": "Restful API web service ",
   "main": "src/index.js",
