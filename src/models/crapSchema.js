@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const pointSchema = require("./pointSchema");
+const { suggestionSchema } = require("./suggestionSchema");
 
 const crapSchema = new mongoose.Schema(
   {
@@ -14,10 +16,10 @@ const crapSchema = new mongoose.Schema(
       minLength: 3,
       maxLength: 255,
     },
-    // location: {
-    //   type: Point,
-    //   required: true,
-    // },
+    location: {
+      type: pointSchema,
+      required: true,
+    },
     images: {
       type: String,
       required: true,
@@ -37,7 +39,7 @@ const crapSchema = new mongoose.Schema(
     //   required: false,
     // },
     // suggestion: {
-    //   type: Suggestion,
+    //   type: suggestionSchema,
     //   required: false,
     // },
   },
@@ -52,6 +54,10 @@ const newCrap = new Crap({
   title: "bag",
   description: "lorem ipsem lorem ipsem lorem ipsem lorem ipsem",
   images: "https://picsum.photos/200",
+  location: {
+    type: "Point",
+    coordinates: [-109, 41],
+  },
   status: "null",
 });
 newCrap.save();
