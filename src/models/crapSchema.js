@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const pointSchema = require("./pointSchema");
-const { suggestionSchema } = require("./suggestionSchema");
+const suggestionSchema = require("./suggestionSchema");
 
 const crapSchema = new mongoose.Schema(
   {
@@ -38,10 +38,10 @@ const crapSchema = new mongoose.Schema(
     //   ref: "User",
     //   required: false,
     // },
-    // suggestion: {
-    //   type: suggestionSchema,
-    //   required: false,
-    // },
+    suggestion: {
+      type: suggestionSchema,
+      required: false,
+    },
   },
   {
     timestamps: true,
@@ -59,6 +59,11 @@ const newCrap = new Crap({
     coordinates: [-109, 41],
   },
   status: "null",
+  suggestion: {
+    address: "bla blah blah",
+    date: "29/03/2025",
+    time: "10:29",
+  },
 });
 newCrap.save();
 
