@@ -37,9 +37,30 @@ const deleteOne = async (req, res, next) => {
   }
 };
 
+const updateOne = async (req, res, next) => {
+  try{
+    const updated=await crapService.updateOne(req.params.id, req.body);
+    res.status(200).json({data:updated});
+  } catch(error){
+    next(error);
+  }
+};
+
+const replaceOne = async (req, res, next) => {
+  try{
+    const replaced=await crapService.replaceOne(req.params.id, req.body);
+    res.status(200).json({data:replaced});
+  } catch(error){
+    next(error);
+  }
+};
+
+
 module.exports = {
   getAll,
   getOne,
   deleteOne,
   createOne,
+  updateOne,
+  replaceOne
 };
