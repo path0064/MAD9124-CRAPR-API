@@ -1,4 +1,5 @@
 const Craps = require("../models/crapSchema");
+const {NotFoundError} = require("../middleware/errors");
 
 const getAll = async () => {
   const craps = await Craps.find({});
@@ -32,9 +33,32 @@ const deleteOne = async (id) => {
   return deleted;
 };
 
+const updateOne = async (id, body) => {
+  const updated = await Craps.findByIdAndUpdate(id, body, { 
+    new: true,
+    runValidators: true
+  });
+
+  if (!updated) throw new NotFoundError(`crap with id ${id} not found`);
+  return updated;
+}
+
+const replaceOne = async (id,body) => {
+  const replaced=await Craps.findOneAndReplace({_id:id}, body,{
+    new:true,
+    runValidators:true
+  });
+
+  if(!replaced) throw new NotFoundError(`crap with id ${id} not found`);
+
+  return replaced;
+}
+
 module.exports = {
   getAll,
   getOne,
   deleteOne,
   createOne,
+  updateOne,
+  replaceOne
 };
