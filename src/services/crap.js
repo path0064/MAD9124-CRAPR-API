@@ -1,5 +1,5 @@
+const { NotFoundError, BadRequestError } = require("../middleware/errors");
 const Craps = require("../models/crapSchema");
-const {NotFoundError} = require("../middleware/errors");
 
 const getAll = async () => {
   const craps = await Craps.find({});
@@ -14,16 +14,28 @@ const getOne = async (id) => {
 };
 
 const createOne = async (body) => {
-  const { title, description, location, images, status } = body;
+  const { title, description, location, images, owner } = body;
   const newCrap = new Craps({
     title: title,
     description: description,
     location: location,
     images: images,
-    status: status,
+    status: "AVAILABLE",
+    owner,
   });
   await newCrap.save();
   return newCrap;
+};
+
+const isInterested = async (id, buyerId) => {
+  const foundCrap = await Craps.findById(id);
+  if (foundCrap.status != "AVAILABLE") {
+    throw new BadRequestError(`This item is currently unavailable.`);
+  } else {
+    foundCrap.status = "INTERESTED";
+    foundCrap.buyer = buyerId;
+  }
+  return foundCrap;
 };
 
 const deleteOne = async (id) => {
@@ -34,25 +46,25 @@ const deleteOne = async (id) => {
 };
 
 const updateOne = async (id, body) => {
-  const updated = await Craps.findByIdAndUpdate(id, body, { 
+  const updated = await Craps.findByIdAndUpdate(id, body, {
     new: true,
-    runValidators: true
+    runValidators: true,
   });
 
   if (!updated) throw new NotFoundError(`crap with id ${id} not found`);
   return updated;
-}
+};
 
-const replaceOne = async (id,body) => {
-  const replaced=await Craps.findOneAndReplace({_id:id}, body,{
-    new:true,
-    runValidators:true
+const replaceOne = async (id, body) => {
+  const replaced = await Craps.findOneAndReplace({ _id: id }, body, {
+    new: true,
+    runValidators: true,
   });
 
-  if(!replaced) throw new NotFoundError(`crap with id ${id} not found`);
+  if (!replaced) throw new NotFoundError(`crap with id ${id} not found`);
 
   return replaced;
-}
+};
 
 module.exports = {
   getAll,
@@ -60,5 +72,6 @@ module.exports = {
   deleteOne,
   createOne,
   updateOne,
-  replaceOne
+  replaceOne,
+  isInterested,
 };
