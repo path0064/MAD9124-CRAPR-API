@@ -13,13 +13,12 @@ router.patch("/:id", isAuthenticated, crapController.updateOne);
 router.put("/:id", isAuthenticated, crapController.replaceOne);
 router.post("/:id/interested", isAuthenticated, crapController.isInterested);
 router.post(
-  "/:id/suggest",
-  isAuthenticated,
-  validateOwner,
-  crapController.suggestion
+    "/:id/suggest",
+    isAuthenticated,
+    validateOwner,
+    crapController.suggestion
 );
-
-//  router.post("/:id/flush");
+router.post('/:id/flushed', isAuthenticated, crapController.flushed);
 router.post("/:id/agreed", isAuthenticated, crapController.agreed);
 
 module.exports = router;

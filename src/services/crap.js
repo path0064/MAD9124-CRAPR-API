@@ -78,6 +78,25 @@ const agreed = async (id, buyerId)=> {
   return crap;
 }
 
+
+const flushed = async (id, ownerId) => {
+  const crap = await Craps.findById(id);
+
+  if (!crap) {
+    throw new NotFoundError(`Crap with id ${id} not found`);
+  }
+  if (crap.status !== "AGREED") {
+    throw new BadRequestError(`Can only flush an agreed crap`);
+  }
+  if (crap.owner.toString() !== ownerId) {
+    throw new ForbiddenError('Only the owner can flush the crap');
+  }
+  crap.status = "FLUSHED";
+  await crap.save();
+  return crap;
+}
+
+
 const deleteOne = async (id) => {
   const deleted = await Craps.findByIdAndDelete(id);
   if (!deleted) throw new NotFoundError(`crap with id ${id} not found`);

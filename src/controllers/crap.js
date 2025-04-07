@@ -52,6 +52,18 @@ const agreed = async (req, res, next) => {
   }
 };
 
+const flushed = async (req, res, next) => {
+  try {
+    const crapId= req.params.id;
+    const ownerId = req.user.id;
+
+    const updatedCrap = await crapService.flushed(crapId, ownerId);
+    res.status(200).json({ data: updatedCrap });
+  } catch (error) {
+    next(error);
+  }
+}
+
 const suggestion = async (req, res, next) => {
   try {
     const foundCrap = await crapService.suggestion(
@@ -100,5 +112,7 @@ module.exports = {
   updateOne,
   replaceOne,
   isInterested,
+  agreed,
+  flushed,
   suggestion,
 };
