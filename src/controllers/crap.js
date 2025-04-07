@@ -4,7 +4,7 @@ const crapService = require("../services/crap.js");
 
 const getAll = async (_req, res, next) => {
   try {
-    let craps = await crapService.getAll();
+    let craps = await crapService.getAll(req.query);
     res.status(200).json({ data: craps });
   } catch (error) {
     next(error);
