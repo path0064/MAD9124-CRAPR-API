@@ -1,3 +1,4 @@
+const suggestionSchema = require("../models/suggestionSchema.js");
 const User = require("../models/userSchema.js");
 const crapService = require("../services/crap.js");
 
@@ -21,7 +22,6 @@ const getOne = async (req, res, next) => {
 
 const createOne = async (req, res, next) => {
   try {
-    console.log("REQ.USER:", req.user);
     req.body.owner = req.user.id;
     const newCrap = await crapService.createOne(req.body);
 
@@ -35,6 +35,18 @@ const isInterested = async (req, res, next) => {
   try {
     buyerId = req.user.id;
     const foundCrap = await crapService.isInterested(req.params.id, buyerId);
+    res.status(201).json({ data: foundCrap });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const suggestion = async (req, res, next) => {
+  try {
+    const foundCrap = await crapService.suggestion(
+      req.params.id,
+      req.body.suggestion
+    );
     res.status(201).json({ data: foundCrap });
   } catch (error) {
     next(error);
@@ -76,4 +88,5 @@ module.exports = {
   updateOne,
   replaceOne,
   isInterested,
+  suggestion,
 };

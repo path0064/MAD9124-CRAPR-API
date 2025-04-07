@@ -29,12 +29,29 @@ const createOne = async (body) => {
 
 const isInterested = async (id, buyerId) => {
   const foundCrap = await Craps.findById(id);
-  if (foundCrap.status != "AVAILABLE") {
+  if (foundCrap.status !== "AVAILABLE") {
     throw new BadRequestError(`This item is currently unavailable.`);
   } else {
     foundCrap.status = "INTERESTED";
     foundCrap.buyer = buyerId;
   }
+  await foundCrap.save();
+  return foundCrap;
+};
+
+const suggestion = async (id, suggestions) => {
+  const foundCrap = await Craps.findById(id);
+  if (foundCrap.status !== "INTERESTED") {
+    throw new BadRequestError("Action cannot be performed");
+  } else {
+    foundCrap.status = "SCHEDULED";
+    foundCrap.suggestion = {
+      address: suggestions.address,
+      date: suggestions.date,
+      time: suggestions.time,
+    };
+  }
+  await foundCrap.save();
   return foundCrap;
 };
 
@@ -74,4 +91,5 @@ module.exports = {
   updateOne,
   replaceOne,
   isInterested,
+  suggestion,
 };
