@@ -1,8 +1,4 @@
-const {
-  NotFoundError,
-  BadRequestError,
-  ForbiddenError,
-} = require("../middleware/errors");
+const { NotFoundError, BadRequestError } = require("../middleware/errors");
 const Craps = require("../models/crapSchema");
 
 const getAll = async ({ query, lat, long, distance, show_taken }) => {
