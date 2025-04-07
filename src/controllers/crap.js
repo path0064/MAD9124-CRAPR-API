@@ -13,7 +13,9 @@ const getAll = async (_req, res, next) => {
 
 const getOne = async (req, res, next) => {
   try {
-    const foundCrap = await crapService.getOne(req.params.id);
+    const foundCrap = await crapService.getOne(
+      req.params.id,
+      req.user.id);
     res.status(200).json({ data: foundCrap });
   } catch (error) {
     next(error);
