@@ -36,7 +36,7 @@ const isInterested = async (id, buyerId) => {
     foundCrap.buyer = buyerId;
   }
   await foundCrap.save();
-<<<<<<< HEAD
+
   return foundCrap;
 };
 
@@ -53,8 +53,7 @@ const suggestion = async (id, suggestions) => {
     };
   }
   await foundCrap.save();
-=======
->>>>>>> nada
+
   return foundCrap;
 };
 
