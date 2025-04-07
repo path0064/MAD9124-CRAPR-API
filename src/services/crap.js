@@ -14,7 +14,7 @@ const getAll = async ({query, lat, long, distance, show_taken}) => {
           type: "Point",
           coordinates: [parseFloat(long), parseFloat(lat)],
         },
-        $maxDistance: parseInt(distance) || 10000,
+        $maxDistance: parseInt(distance),
       }
     }
   }
@@ -22,7 +22,7 @@ const getAll = async ({query, lat, long, distance, show_taken}) => {
   filter.status = show_taken === "true"? {$ne :"FLUSHED"} : "AVAILABLE";
 
   const craps = await Craps.find(filter)
-    
+
     .select('-location -buyer -suggestion')
     .populate("owner", "name")
 
