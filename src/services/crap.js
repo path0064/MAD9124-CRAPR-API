@@ -1,8 +1,31 @@
+const { parse } = require("dotenv");
 const { NotFoundError, BadRequestError, ForbiddenError } = require("../middleware/errors");
 const Craps = require("../models/crapSchema");
 
-const getAll = async () => {
-  const craps = await Craps.find({});
+const getAll = async ({query, lat, long, distance, show_taken}) => {
+  const filter = {};
+
+  if (query) filter.$text = { $search: query };
+
+  if (lat && long) {
+    filter.location ={
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [parseFloat(long), parseFloat(lat)],
+        },
+        $maxDistance: parseInt(distance) || 10000,
+      }
+    }
+  }
+
+  filter.status = show_taken === "true"? {$ne :"FLUSHED"} : "AVAILABLE";
+
+  const craps = await Craps.find(filter)
+    
+    .select('-location -buyer -suggestion')
+    .populate("owner", "name")
+
   return craps;
 };
 
