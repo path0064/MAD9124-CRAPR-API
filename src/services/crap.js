@@ -78,6 +78,24 @@ const agreed = async (id, buyerId)=> {
   return crap;
 }
 
+const disagree = async (id, buyerId) => {
+  const crap = await Craps.findById(id);
+  if (!crap) {
+    throw new NotFoundError(`Crap with id ${id} not found`);
+  }
+  if (crap.status !== "SCHEDULED") {
+    throw new BadRequestError(`Can only disagree with a scheduled crap`);
+  }
+  if (crap.buyer.toString() !== buyerId) {
+    throw new ForbiddenError('Only the buyer can disagree with the crap');
+  }
+  crap.status = "INTERESTED";
+  crap.suggestion = undefined;
+  crap.buyer = undefined;
+  await crap.save();
+  return crap;
+}
+
 
 const flushed = async (id, ownerId) => {
   const crap = await Craps.findById(id);
@@ -92,6 +110,26 @@ const flushed = async (id, ownerId) => {
     throw new ForbiddenError('Only the owner can flush the crap');
   }
   crap.status = "FLUSHED";
+  await crap.save();
+  return crap;
+}
+
+const reset = async (id, buyerId) => {
+  const crap = await Craps.findById(id);
+
+  if (!crap) {
+    throw new NotFoundError(`Crap with id ${id} not found`);
+  }
+  if (crap.statues ==="FLUSHED" || crap.statues === "AGREED") {
+    throw new BadRequestError(`Cannot reset when status is ${crap.status}`);
+  }
+
+  if (crap.buyer.toString() !== buyerId) {
+    throw new ForbiddenError('Only the buyer can reset the crap');
+  }
+  crap.status = "AVAILABLE";
+  crap.suggestion = undefined;
+  crap.buyer = undefined;
   await crap.save();
   return crap;
 }
@@ -134,4 +172,8 @@ module.exports = {
   replaceOne,
   isInterested,
   suggestion,
+  agreed,
+  disagree,
+  flushed,
+  reset,
 };

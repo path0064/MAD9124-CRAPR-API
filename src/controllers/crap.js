@@ -52,6 +52,30 @@ const agreed = async (req, res, next) => {
   }
 };
 
+const disagree = async (req, res, next) => {
+  try {
+    const crapId= req.params.id;
+    const buyerId = req.user.id;
+
+    const updatedCrap = await crapService.disagree(crapId, buyerId);
+    res.status(200).json({ data: updatedCrap });
+  } catch (error) {
+    next(error);
+  }
+}
+
+const reset = async (req, res, next) => {
+  try {
+    const crapId= req.params.id;
+    const buyerId = req.user.id;
+
+    const updatedCrap = await crapService.reset(crapId, buyerId);
+    res.status(200).json({ data: updatedCrap });
+  } catch (error) {
+    next(error);
+  }
+}
+
 const flushed = async (req, res, next) => {
   try {
     const crapId= req.params.id;
@@ -113,6 +137,8 @@ module.exports = {
   replaceOne,
   isInterested,
   agreed,
+  disagree,
   flushed,
   suggestion,
+  reset,
 };
