@@ -26,7 +26,9 @@ const crapSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      enum: ["AVAILABLE", "INTERESTED", "SCHEDULED", "AGREED", "FLUSHED"],
       required: true,
+      default: "AVAILABLE",
     },
     owner: {
       type: mongoose.SchemaTypes.ObjectId,

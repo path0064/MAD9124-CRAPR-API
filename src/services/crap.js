@@ -1,4 +1,4 @@
-const { NotFoundError, BadRequestError } = require("../middleware/errors");
+const { NotFoundError, BadRequestError, ForbiddenError } = require("../middleware/errors");
 const Craps = require("../models/crapSchema");
 
 const getAll = async () => {
@@ -35,8 +35,30 @@ const isInterested = async (id, buyerId) => {
     foundCrap.status = "INTERESTED";
     foundCrap.buyer = buyerId;
   }
+  await foundCrap.save();
   return foundCrap;
 };
+
+const agreed = async (id, buyerId)=> {
+  const crap = await Craps.findById(id);
+
+  if(!crap) {
+    throw new NotFoundError(`Crap with id ${id} not found`);
+  }
+
+  if (crap.statues !== "SCHEDULED") {
+    throw new BadRequestError(`Can only agree to a scheduled crap`);
+  }
+
+  if (crap.buyer.toString() !== buyerId) {
+    throw new ForbiddenError('Only the buyer can agree to the crap');
+  }
+
+  crap.status = "AGREED";
+
+  await crap.save();
+  return crap;
+}
 
 const deleteOne = async (id) => {
   const deleted = await Craps.findByIdAndDelete(id);

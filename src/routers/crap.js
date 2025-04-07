@@ -11,5 +11,6 @@ router.post("/", isAuthenticated, crapController.createOne);
 router.patch("/:id", isAuthenticated, crapController.updateOne);
 router.put("/:id", isAuthenticated, crapController.replaceOne);
 router.post("/:id/interested", isAuthenticated, crapController.isInterested);
+router.post("/:id/agreed", isAuthenticated, crapController.agreed);
 
 module.exports = router;
