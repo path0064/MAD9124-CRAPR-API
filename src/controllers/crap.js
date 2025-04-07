@@ -41,6 +41,53 @@ const isInterested = async (req, res, next) => {
   }
 };
 
+const agreed = async (req, res, next) => {
+  try {
+    const buyerId = req.user.id;
+    const crapId = req.params.id;
+    const updatedCrap = await crapService.agreed(crapId, buyerId);
+    res.status(200).json({ data: updatedCrap });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const disagree = async (req, res, next) => {
+  try {
+    const crapId= req.params.id;
+    const buyerId = req.user.id;
+
+    const updatedCrap = await crapService.disagree(crapId, buyerId);
+    res.status(200).json({ data: updatedCrap });
+  } catch (error) {
+    next(error);
+  }
+}
+
+const reset = async (req, res, next) => {
+  try {
+    const crapId= req.params.id;
+    const buyerId = req.user.id;
+
+    const updatedCrap = await crapService.reset(crapId, buyerId);
+    res.status(200).json({ data: updatedCrap });
+  } catch (error) {
+    next(error);
+  }
+}
+
+const flushed = async (req, res, next) => {
+  try {
+    const crapId= req.params.id;
+    const ownerId = req.user.id;
+
+    const updatedCrap = await crapService.flushed(crapId, ownerId);
+    res.status(200).json({ data: updatedCrap });
+  } catch (error) {
+    next(error);
+  }
+}
+
 const suggestion = async (req, res, next) => {
   try {
     const foundCrap = await crapService.suggestion(
@@ -52,6 +99,7 @@ const suggestion = async (req, res, next) => {
     next(error);
   }
 };
+
 
 const deleteOne = async (req, res, next) => {
   try {
@@ -88,5 +136,9 @@ module.exports = {
   updateOne,
   replaceOne,
   isInterested,
+  agreed,
+  disagree,
+  flushed,
   suggestion,
+  reset,
 };
