@@ -41,6 +41,17 @@ const isInterested = async (req, res, next) => {
   }
 };
 
+const agreed = async (req, res, next) => {
+  try {
+    const buyerId = req.user.id;
+    const crapId = req.params.id;
+    const updatedCrap = await crapService.agreed(crapId, buyerId);
+    res.status(200).json({ data: updatedCrap });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const suggestion = async (req, res, next) => {
   try {
     const foundCrap = await crapService.suggestion(
@@ -52,6 +63,7 @@ const suggestion = async (req, res, next) => {
     next(error);
   }
 };
+
 
 const deleteOne = async (req, res, next) => {
   try {
