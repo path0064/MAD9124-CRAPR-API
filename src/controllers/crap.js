@@ -4,7 +4,7 @@ const crapService = require("../services/crap.js");
 
 const getAll = async (_req, res, next) => {
   try {
-    let craps = await crapService.getAll(req.query);
+    let craps = await crapService.getAll(_req.query);
     res.status(200).json({ data: craps });
   } catch (error) {
     next(error);
@@ -24,8 +24,8 @@ const getOne = async (req, res, next) => {
 
 const createOne = async (req, res, next) => {
   try {
-    req.body.owner = req.user.id;
-    const newCrap = await crapService.createOne(req.body);
+    req.sanitizedBody.owner = req.user.id;
+    const newCrap = await crapService.createOne(req.sanitizedBody);
 
     res.status(201).json({ data: newCrap });
   } catch (error) {
@@ -56,7 +56,7 @@ const agreed = async (req, res, next) => {
 
 const disagree = async (req, res, next) => {
   try {
-    const crapId= req.params.id;
+    const crapId = req.params.id;
     const buyerId = req.user.id;
 
     const updatedCrap = await crapService.disagree(crapId, buyerId);
@@ -64,11 +64,11 @@ const disagree = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}
+};
 
 const reset = async (req, res, next) => {
   try {
-    const crapId= req.params.id;
+    const crapId = req.params.id;
     const buyerId = req.user.id;
 
     const updatedCrap = await crapService.reset(crapId, buyerId);
@@ -76,11 +76,11 @@ const reset = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}
+};
 
 const flushed = async (req, res, next) => {
   try {
-    const crapId= req.params.id;
+    const crapId = req.params.id;
     const ownerId = req.user.id;
 
     const updatedCrap = await crapService.flushed(crapId, ownerId);
@@ -88,20 +88,19 @@ const flushed = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}
+};
 
 const suggestion = async (req, res, next) => {
   try {
     const foundCrap = await crapService.suggestion(
       req.params.id,
-      req.body.suggestion
+      req.sanitizedBody.suggestion
     );
     res.status(201).json({ data: foundCrap });
   } catch (error) {
     next(error);
   }
 };
-
 
 const deleteOne = async (req, res, next) => {
   try {
@@ -114,7 +113,10 @@ const deleteOne = async (req, res, next) => {
 
 const updateOne = async (req, res, next) => {
   try {
-    const updated = await crapService.updateOne(req.params.id, req.body);
+    const updated = await crapService.updateOne(
+      req.params.id,
+      req.sanitizedBody
+    );
     res.status(200).json({ data: updated });
   } catch (error) {
     next(error);
@@ -123,7 +125,10 @@ const updateOne = async (req, res, next) => {
 
 const replaceOne = async (req, res, next) => {
   try {
-    const replaced = await crapService.replaceOne(req.params.id, req.body);
+    const replaced = await crapService.replaceOne(
+      req.params.id,
+      req.sanitizedBody
+    );
     res.status(200).json({ data: replaced });
   } catch (error) {
     next(error);

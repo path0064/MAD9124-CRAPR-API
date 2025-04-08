@@ -1,38 +1,42 @@
-const { parse } = require("dotenv");
-const { NotFoundError, BadRequestError, ForbiddenError } = require("../middleware/errors");
+const { NotFoundError, BadRequestError } = require("../middleware/errors");
 const Craps = require("../models/crapSchema");
 
-const getAll = async ({query, lat, long, distance, show_taken}) => {
+const getAll = async ({ query, lat, long, distance, show_taken }) => {
   const filter = {};
 
   if (query) filter.$text = { $search: query };
 
   if (lat && long) {
-    filter.location ={
+    filter.location = {
       $near: {
         $geometry: {
           type: "Point",
           coordinates: [parseFloat(long), parseFloat(lat)],
         },
         $maxDistance: parseInt(distance),
-      }
-    }
+      },
+    };
   }
 
-  filter.status = show_taken === "true"? {$ne :"FLUSHED"} : "AVAILABLE";
+  filter.status = show_taken === "true" ? { $ne: "FLUSHED" } : "AVAILABLE";
 
   const craps = await Craps.find(filter)
 
-    .select('-location -buyer -suggestion')
-    .populate("owner", "name")
+    .select("-location -buyer -suggestion")
+    .populate("owner", "name");
 
   return craps;
 };
+
 
 const getOne = async (id, userId) => {
   const foundCrap = await Craps.findById(id)
   .populate("owner buyer", "name")
   .lean();
+
+
+const getOne = async (id) => {
+  const foundCrap = await Craps.findById(id);
 
   if (!foundCrap) throw new NotFoundError(`crap with id ${id} not found`);
 
@@ -76,7 +80,7 @@ const isInterested = async (id, buyerId) => {
 const suggestion = async (id, suggestions) => {
   const foundCrap = await Craps.findById(id);
   if (foundCrap.status !== "INTERESTED") {
-    throw new BadRequestError("Action cannot be performed");
+    throw new BadRequestError("This item has not been marked as interested");
   } else {
     foundCrap.status = "SCHEDULED";
     foundCrap.suggestion = {
@@ -90,83 +94,54 @@ const suggestion = async (id, suggestions) => {
   return foundCrap;
 };
 
-const agreed = async (id, buyerId)=> {
+const agreed = async (id) => {
   const crap = await Craps.findById(id);
-
-  if(!crap) {
-    throw new NotFoundError(`Crap with id ${id} not found`);
-  }
-
-  if (crap.statues !== "SCHEDULED") {
+  if (crap.status !== "SCHEDULED") {
     throw new BadRequestError(`Can only agree to a scheduled crap`);
+  } else {
+    crap.status = "AGREED";
   }
-
-  if (crap.buyer.toString() !== buyerId) {
-    throw new ForbiddenError('Only the buyer can agree to the crap');
-  }
-
-  crap.status = "AGREED";
-
   await crap.save();
   return crap;
-}
+};
 
-const disagree = async (id, buyerId) => {
+const disagree = async (id) => {
   const crap = await Craps.findById(id);
-  if (!crap) {
-    throw new NotFoundError(`Crap with id ${id} not found`);
-  }
+
   if (crap.status !== "SCHEDULED") {
     throw new BadRequestError(`Can only disagree with a scheduled crap`);
   }
-  if (crap.buyer.toString() !== buyerId) {
-    throw new ForbiddenError('Only the buyer can disagree with the crap');
-  }
+
   crap.status = "INTERESTED";
   crap.suggestion = undefined;
-  crap.buyer = undefined;
   await crap.save();
   return crap;
-}
+};
 
-
-const flushed = async (id, ownerId) => {
+const flushed = async (id) => {
   const crap = await Craps.findById(id);
 
-  if (!crap) {
-    throw new NotFoundError(`Crap with id ${id} not found`);
-  }
   if (crap.status !== "AGREED") {
     throw new BadRequestError(`Can only flush an agreed crap`);
   }
-  if (crap.owner.toString() !== ownerId) {
-    throw new ForbiddenError('Only the owner can flush the crap');
-  }
+
   crap.status = "FLUSHED";
   await crap.save();
   return crap;
-}
+};
 
-const reset = async (id, buyerId) => {
+const reset = async (id) => {
   const crap = await Craps.findById(id);
 
-  if (!crap) {
-    throw new NotFoundError(`Crap with id ${id} not found`);
-  }
-  if (crap.statues ==="FLUSHED" || crap.statues === "AGREED") {
+  if (crap.status === "FLUSHED") {
     throw new BadRequestError(`Cannot reset when status is ${crap.status}`);
-  }
-
-  if (crap.buyer.toString() !== buyerId) {
-    throw new ForbiddenError('Only the buyer can reset the crap');
   }
   crap.status = "AVAILABLE";
   crap.suggestion = undefined;
   crap.buyer = undefined;
   await crap.save();
   return crap;
-}
-
+};
 
 const deleteOne = async (id) => {
   const deleted = await Craps.findByIdAndDelete(id);
