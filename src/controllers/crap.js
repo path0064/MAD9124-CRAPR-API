@@ -2,9 +2,9 @@ const suggestionSchema = require("../models/suggestionSchema.js");
 const User = require("../models/userSchema.js");
 const crapService = require("../services/crap.js");
 
-const getAll = async (_req, res, next) => {
+const getAll = async (req, res, next) => {
   try {
-    let craps = await crapService.getAll(_req.query);
+    let craps = await crapService.getAll(req.body);
     res.status(200).json({ data: craps });
   } catch (error) {
     next(error);
@@ -23,7 +23,7 @@ const getOne = async (req, res, next) => {
 const createOne = async (req, res, next) => {
   try {
     req.sanitizedBody.owner = req.user.id;
-    const newCrap = await crapService.createOne(req.sanitizedBody);
+    const newCrap = await crapService.createOne(req.sanitizedBody, req.files);
 
     res.status(201).json({ data: newCrap });
   } catch (error) {

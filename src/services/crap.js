@@ -1,46 +1,64 @@
 const { NotFoundError, BadRequestError } = require("../middleware/errors");
+const imageService = require("./images");
 const Craps = require("../models/crapSchema");
 
 const getAll = async ({ query, lat, long, distance, show_taken }) => {
   const filter = {};
-
-  if (query) filter.$text = { $search: query };
-
-  if (lat && long) {
-    filter.location = {
-      $near: {
-        $geometry: {
-          type: "Point",
-          coordinates: [parseFloat(long), parseFloat(lat)],
-        },
-        $maxDistance: parseInt(distance),
+  filter.location = {
+    $near: {
+      $geometry: {
+        type: "Point",
+        coordinates: [parseFloat(long), parseFloat(lat)],
       },
-    };
+      $maxDistance: parseInt(distance),
+    },
+  };
+
+  let crapResult = [];
+
+  const regexQuery = new RegExp(query, "i");
+
+  if (show_taken && show_taken === "true") {
+    crapResult = await Craps.find(filter)
+      .or([
+        { title: { $regex: regexQuery } },
+        { description: { $regex: regexQuery } },
+      ])
+      .where("status")
+      .in(["AVAILABLE", "INTERESTED", "SCHEDULED", "AGREED"])
+
+      .populate({ path: "owner", select: "name" });
+  } else {
+    crapResult = await Craps.find(filter)
+      .or([
+        { title: { $regex: regexQuery } },
+        { description: { $regex: regexQuery } },
+      ])
+      .where({ status: "AVAILABLE" })
+
+      .populate({ path: "owner", select: "name" });
   }
-
-  filter.status = show_taken === "true" ? { $ne: "FLUSHED" } : "AVAILABLE";
-
-  const craps = await Craps.find(filter)
-
-    .select("-location -buyer -suggestion")
-    .populate("owner", "name");
-
-  return craps;
+  return crapResult;
 };
 
 const getOne = async (id) => {
-  const foundCrap = await Craps.findById(id);
+  const foundCrap = await Craps.findById(id).populate({
+    path: "owner",
+    select: "name",
+  });
   if (!foundCrap) throw new NotFoundError(`crap with id ${id} not found`);
   return foundCrap;
 };
 
-const createOne = async (body) => {
+const createOne = async (body, files) => {
+  const urls = await imageService.uploadMany(files);
+
   const { title, description, location, images, owner } = body;
   const newCrap = new Craps({
     title: title,
     description: description,
     location: location,
-    images: images,
+    images: urls,
     status: "AVAILABLE",
     owner,
   });
@@ -128,7 +146,10 @@ const reset = async (id) => {
 };
 
 const deleteOne = async (id) => {
-  const deleted = await Craps.findByIdAndDelete(id);
+  const deleted = await Craps.findByIdAndDelete(id).populate({
+    path: "owner",
+    select: "name",
+  });
   if (!deleted) throw new NotFoundError(`crap with id ${id} not found`);
 
   return deleted;
@@ -138,7 +159,7 @@ const updateOne = async (id, body) => {
   const updated = await Craps.findByIdAndUpdate(id, body, {
     new: true,
     runValidators: true,
-  });
+  }).populate({ path: "owner", select: "name" });
 
   if (!updated) throw new NotFoundError(`crap with id ${id} not found`);
   return updated;
@@ -148,7 +169,7 @@ const replaceOne = async (id, body) => {
   const replaced = await Craps.findOneAndReplace({ _id: id }, body, {
     new: true,
     runValidators: true,
-  });
+  }).populate({ path: "owner", select: "name" });
 
   if (!replaced) throw new NotFoundError(`crap with id ${id} not found`);
 
