@@ -28,15 +28,10 @@ const getAll = async ({ query, lat, long, distance, show_taken }) => {
   return craps;
 };
 
-
-const getOne = async (id, userId) => {
+const getOne = async (id) => {
   const foundCrap = await Craps.findById(id)
   .populate("owner buyer", "name")
   .lean();
-
-
-const getOne = async (id) => {
-  const foundCrap = await Craps.findById(id);
 
   if (!foundCrap) throw new NotFoundError(`crap with id ${id} not found`);
 
