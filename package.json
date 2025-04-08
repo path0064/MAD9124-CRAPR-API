@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "repository": "https://github.com/path0064/MAD9124-CRAPR-API.git",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "start": "node index.js"
   },
   "author": "Jowairia and Nada",
   "license": "MIT",
