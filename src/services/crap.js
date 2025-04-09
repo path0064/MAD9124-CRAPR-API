@@ -1,4 +1,8 @@
-const { NotFoundError, BadRequestError } = require("../middleware/errors");
+const {
+  NotFoundError,
+  BadRequestError,
+  ForbiddenError,
+} = require("../middleware/errors");
 const imageService = require("./images");
 const Craps = require("../models/crapSchema");
 
@@ -135,11 +139,15 @@ const flushed = async (id) => {
   return crap;
 };
 
-const reset = async (id) => {
+const reset = async (id, userId) => {
   const crap = await Craps.findById(id);
 
   if (crap.status === "FLUSHED") {
     throw new BadRequestError(`Cannot reset when status is ${crap.status}`);
+  }
+  if (userId !== crap.buyer.toString() && userId !== crap.owner.toString()) {
+    console.log([crap.owner, crap.owner]);
+    throw new ForbiddenError("Only the buyer or seller can reset the crap");
   }
   crap.status = "AVAILABLE";
   crap.suggestion = undefined;

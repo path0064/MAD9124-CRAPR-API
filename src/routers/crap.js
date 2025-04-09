@@ -73,12 +73,6 @@ router.post(
   validateBuyer,
   crapController.disagree
 );
-router.post(
-  "/:id/reset",
-  isAuthenticated,
-  validObjectId,
-  validateBuyer,
-  crapController.reset
-);
+router.post("/:id/reset", isAuthenticated, validObjectId, crapController.reset);
 
 module.exports = router;

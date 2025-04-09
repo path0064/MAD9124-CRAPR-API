@@ -67,9 +67,9 @@ const disagree = async (req, res, next) => {
 const reset = async (req, res, next) => {
   try {
     const crapId = req.params.id;
-    const buyerId = req.user.id;
+    const userId = req.user.id;
 
-    const updatedCrap = await crapService.reset(crapId, buyerId);
+    const updatedCrap = await crapService.reset(crapId, userId);
     res.status(200).json({ data: updatedCrap });
   } catch (error) {
     next(error);
@@ -92,8 +92,7 @@ const suggestion = async (req, res, next) => {
   try {
     const foundCrap = await crapService.suggestion(
       req.params.id,
-      req.body.suggestions,
-      console.log(req.body)
+      req.body.suggestion
     );
 
     res.status(201).json({ data: foundCrap });
