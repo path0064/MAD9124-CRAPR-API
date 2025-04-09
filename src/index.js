@@ -12,12 +12,12 @@ connect();
 
 const app = express();
 
-app.use(
-  cors({
-    origin: (process.env.CORS_ALLOWLIST || "").split(","),
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: (process.env.CORS_ALLOWLIST || "").split(","),
+//     credentials: true,
+//   })
+// );
 
 app.use(express.json());
 
