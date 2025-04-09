@@ -54,6 +54,7 @@ const crapSchema = new mongoose.Schema(
   }
 );
 
+crapSchema.index({ location: "2dsphere" });
 const Crap = mongoose.model("Crap", crapSchema);
 
 // const newCrap = new Crap({

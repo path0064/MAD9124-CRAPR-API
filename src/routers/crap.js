@@ -3,6 +3,7 @@ const { Router } = require("express");
 const crapController = require("../controllers/crap.js");
 const sanitizeBody = require("../middleware/sanitizeBody");
 const validObjectId = require("../middleware/validateObject");
+const addImages = require("../middleware/addImages");
 const isAuthenticated = require("../middleware/isAuthenticated.js");
 const { validateBuyer, validateOwner } = require("../middleware/isOwn.js");
 const router = Router();
@@ -10,12 +11,20 @@ const router = Router();
 router.get("/", isAuthenticated, crapController.getAll);
 router.get("/:id", isAuthenticated, validObjectId, crapController.getOne);
 router.delete("/:id", isAuthenticated, validObjectId, crapController.deleteOne);
-router.post("/", sanitizeBody, isAuthenticated, crapController.createOne);
+router.post(
+  "/",
+  isAuthenticated,
+  addImages,
+  sanitizeBody,
+  crapController.createOne
+);
 router.patch(
   "/:id",
   sanitizeBody,
   isAuthenticated,
   validObjectId,
+  addImages,
+  validateOwner,
   crapController.updateOne
 );
 router.put(
@@ -23,6 +32,8 @@ router.put(
   sanitizeBody,
   isAuthenticated,
   validObjectId,
+  addImages,
+  validateOwner,
   crapController.replaceOne
 );
 router.post(
@@ -34,8 +45,8 @@ router.post(
 
 router.post(
   "/:id/suggest",
-  sanitizeBody,
   isAuthenticated,
+  // sanitizeBody,
   validObjectId,
   validateOwner,
   crapController.suggestion
@@ -62,12 +73,6 @@ router.post(
   validateBuyer,
   crapController.disagree
 );
-router.post(
-  "/:id/reset",
-  isAuthenticated,
-  validObjectId,
-  validateBuyer,
-  crapController.reset
-);
+router.post("/:id/reset", isAuthenticated, validObjectId, crapController.reset);
 
 module.exports = router;
