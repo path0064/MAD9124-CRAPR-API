@@ -92,8 +92,10 @@ const suggestion = async (req, res, next) => {
   try {
     const foundCrap = await crapService.suggestion(
       req.params.id,
-      req.sanitizedBody.suggestion
+      req.body.suggestions,
+      console.log(req.body)
     );
+
     res.status(201).json({ data: foundCrap });
   } catch (error) {
     next(error);

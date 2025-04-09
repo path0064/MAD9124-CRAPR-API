@@ -27,7 +27,7 @@ const getAll = async ({ query, lat, long, distance, show_taken }) => {
       .where("status")
       .in(["AVAILABLE", "INTERESTED", "SCHEDULED", "AGREED"])
 
-      .populate({ path: "owner", select: "name" });
+      .populate({ path: "owner", select: "-googleId" });
   } else {
     crapResult = await Craps.find(filter)
       .or([
@@ -36,7 +36,7 @@ const getAll = async ({ query, lat, long, distance, show_taken }) => {
       ])
       .where({ status: "AVAILABLE" })
 
-      .populate({ path: "owner", select: "name" });
+      .populate({ path: "owner", select: "-googleId" });
   }
   return crapResult;
 };
@@ -44,7 +44,7 @@ const getAll = async ({ query, lat, long, distance, show_taken }) => {
 const getOne = async (id) => {
   const foundCrap = await Craps.findById(id).populate({
     path: "owner",
-    select: "name",
+    select: "-googleId",
   });
   if (!foundCrap) throw new NotFoundError(`crap with id ${id} not found`);
   return foundCrap;
@@ -53,11 +53,14 @@ const getOne = async (id) => {
 const createOne = async (body, files) => {
   const urls = await imageService.uploadMany(files);
 
-  const { title, description, location, images, owner } = body;
+  const { title, description, lat, long, owner } = body;
   const newCrap = new Craps({
     title: title,
     description: description,
-    location: location,
+    location: {
+      type: "Point",
+      coordinates: [long, lat],
+    },
     images: urls,
     status: "AVAILABLE",
     owner,
@@ -155,7 +158,10 @@ const deleteOne = async (id) => {
   return deleted;
 };
 
-const updateOne = async (id, body) => {
+const updateOne = async (id, body, files) => {
+  if (Array.isArray(files) && files.length) {
+    body.images = await imageService.uploadMany(files);
+  }
   const updated = await Craps.findByIdAndUpdate(id, body, {
     new: true,
     runValidators: true,
@@ -165,11 +171,16 @@ const updateOne = async (id, body) => {
   return updated;
 };
 
-const replaceOne = async (id, body) => {
-  const replaced = await Craps.findOneAndReplace({ _id: id }, body, {
-    new: true,
-    runValidators: true,
-  }).populate({ path: "owner", select: "name" });
+const replaceOne = async (id, body, files) => {
+  const urls = await imageService.uploadMany(files);
+  const replaced = await Craps.findOneAndReplace(
+    { _id: id },
+    { ...body, images: urls },
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).populate({ path: "owner", select: "name" });
 
   if (!replaced) throw new NotFoundError(`crap with id ${id} not found`);
 
