@@ -112,6 +112,7 @@ const deleteOne = async (req, res, next) => {
 
 const updateOne = async (req, res, next) => {
   try {
+    req.sanitizedBody.owner = req.user.id;
     const updated = await crapService.updateOne(
       req.params.id,
       req.sanitizedBody
@@ -124,9 +125,11 @@ const updateOne = async (req, res, next) => {
 
 const replaceOne = async (req, res, next) => {
   try {
+    req.sanitizedBody.owner = req.user.id;
     const replaced = await crapService.replaceOne(
       req.params.id,
-      req.sanitizedBody
+      req.sanitizedBody,
+      req.files
     );
     res.status(200).json({ data: replaced });
   } catch (error) {

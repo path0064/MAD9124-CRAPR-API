@@ -29,10 +29,11 @@ router.patch(
 );
 router.put(
   "/:id",
-  sanitizeBody,
+
   isAuthenticated,
   validObjectId,
   addImages,
+  sanitizeBody,
   validateOwner,
   crapController.replaceOne
 );

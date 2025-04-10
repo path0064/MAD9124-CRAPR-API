@@ -176,6 +176,7 @@ const updateOne = async (id, body, files) => {
   }).populate({ path: "owner", select: "name" });
 
   if (!updated) throw new NotFoundError(`crap with id ${id} not found`);
+  await updated.save();
   return updated;
 };
 
@@ -183,7 +184,14 @@ const replaceOne = async (id, body, files) => {
   const urls = await imageService.uploadMany(files);
   const replaced = await Craps.findOneAndReplace(
     { _id: id },
-    { ...body, images: urls },
+    {
+      ...body,
+      images: urls,
+      location: {
+        type: "Point",
+        coordinates: [body.long, body.lat],
+      },
+    },
     {
       new: true,
       runValidators: true,
@@ -191,7 +199,7 @@ const replaceOne = async (id, body, files) => {
   ).populate({ path: "owner", select: "name" });
 
   if (!replaced) throw new NotFoundError(`crap with id ${id} not found`);
-
+  await replaced.save();
   return replaced;
 };
 
