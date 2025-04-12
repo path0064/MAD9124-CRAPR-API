@@ -5,6 +5,7 @@ const {
 } = require("../middleware/errors");
 const imageService = require("./images");
 const Craps = require("../models/crapSchema");
+const { use } = require("passport");
 
 const getAll = async ({ query, lat, long, distance, show_taken }) => {
   const filter = {};
@@ -53,6 +54,15 @@ const getOne = async (id) => {
   if (!foundCrap) throw new NotFoundError(`crap with id ${id} not found`);
   return foundCrap;
 };
+
+const getMine = async (userId) => {
+  const foundCrap= await Craps.find({
+    $or: [{ owner: userId }, { buyer: userId }],
+  }).populate({ path: "owner buyer", select: "-googleId" })
+
+    return foundCrap;
+}
+  
 
 const createOne = async (body, files) => {
   const urls = await imageService.uploadMany(files);
@@ -216,4 +226,5 @@ module.exports = {
   disagree,
   flushed,
   reset,
+  getMine,
 };
