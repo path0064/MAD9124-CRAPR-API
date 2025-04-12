@@ -20,6 +20,16 @@ const getOne = async (req, res, next) => {
   }
 };
 
+const getMine = async (req, res, next) => {
+  try{
+    const userId= req.user.id;
+    const foundCrap = await crapService.getMine(userId);
+    res.status(200).json({ data: foundCrap });
+  } catch (error) {
+    next(error);
+  }
+}
+
 const createOne = async (req, res, next) => {
   try {
     req.sanitizedBody.owner = req.user.id;
@@ -150,4 +160,5 @@ module.exports = {
   flushed,
   suggestion,
   reset,
+  getMine,
 };
