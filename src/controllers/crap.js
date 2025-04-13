@@ -4,7 +4,10 @@ const crapService = require("../services/crap.js");
 
 const getAll = async (req, res, next) => {
   try {
-    let craps = await crapService.getAll(req.body);
+    const { query, distance, lat, long, show_taken } = req.query;
+    let craps = await crapService.getAll(
+      query || distance || lat || long || show_taken ? req.query : req.body
+    );
     res.status(200).json({ data: craps });
   } catch (error) {
     next(error);
@@ -21,14 +24,14 @@ const getOne = async (req, res, next) => {
 };
 
 const getMine = async (req, res, next) => {
-  try{
-    const userId= req.user.id;
+  try {
+    const userId = req.user.id;
     const foundCrap = await crapService.getMine(userId);
     res.status(200).json({ data: foundCrap });
   } catch (error) {
     next(error);
   }
-}
+};
 
 const createOne = async (req, res, next) => {
   try {
