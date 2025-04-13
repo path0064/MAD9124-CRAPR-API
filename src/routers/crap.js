@@ -8,9 +8,9 @@ const isAuthenticated = require("../middleware/isAuthenticated.js");
 const { validateBuyer, validateOwner } = require("../middleware/isOwn.js");
 const router = Router();
 
+router.get("/mine", isAuthenticated, crapController.getMine);
 router.get("/", isAuthenticated, crapController.getAll);
 router.get("/:id", isAuthenticated, validObjectId, crapController.getOne);
-router.get("/mine", isAuthenticated, crapController.getMine);
 router.delete("/:id", isAuthenticated, validObjectId, crapController.deleteOne);
 router.post(
   "/",
