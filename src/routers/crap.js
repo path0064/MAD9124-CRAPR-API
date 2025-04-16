@@ -48,7 +48,7 @@ router.post(
 router.post(
   "/:id/suggest",
   isAuthenticated,
-  // sanitizeBody,
+  sanitizeBody,
   validObjectId,
   validateOwner,
   crapController.suggestion

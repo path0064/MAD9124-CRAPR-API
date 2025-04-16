@@ -46,23 +46,36 @@ const getAll = async ({ query, lat, long, distance, show_taken }) => {
   return crapResult;
 };
 
-const getOne = async (id) => {
-  const foundCrap = await Craps.findById(id).populate({
-    path: "owner",
-    select: "-googleId",
-  });
+const getOne = async (id, userId) => {
+  const foundCrap = await Craps.findById(id)
+    .populate({
+      path: "owner",
+      select: "name",
+    })
+    .populate({ path: "buyer", select: "name" });
   if (!foundCrap) throw new NotFoundError(`crap with id ${id} not found`);
-  return foundCrap;
+
+  const crapResult = foundCrap.toObject();
+
+  if (
+    userId !== crapResult.buyer?._id.toString() &&
+    userId !== crapResult.owner?._id.toString()
+  ) {
+    delete crapResult.location;
+    delete crapResult.buyer;
+    delete crapResult.suggestion;
+  }
+
+  return crapResult;
 };
 
 const getMine = async (userId) => {
-  const foundCrap= await Craps.find({
+  const foundCrap = await Craps.find({
     $or: [{ owner: userId }, { buyer: userId }],
-  }).populate({ path: "owner buyer", select: "-googleId" })
+  }).populate({ path: "owner buyer", select: "-googleId" });
 
-    return foundCrap;
-}
-  
+  return foundCrap;
+};
 
 const createOne = async (body, files) => {
   const urls = await imageService.uploadMany(files);

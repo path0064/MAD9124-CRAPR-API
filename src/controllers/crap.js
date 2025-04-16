@@ -16,7 +16,8 @@ const getAll = async (req, res, next) => {
 
 const getOne = async (req, res, next) => {
   try {
-    const foundCrap = await crapService.getOne(req.params.id);
+    const userId = req.user.id;
+    const foundCrap = await crapService.getOne(req.params.id, userId);
     res.status(200).json({ data: foundCrap });
   } catch (error) {
     next(error);
@@ -128,7 +129,8 @@ const updateOne = async (req, res, next) => {
     req.sanitizedBody.owner = req.user.id;
     const updated = await crapService.updateOne(
       req.params.id,
-      req.sanitizedBody
+      req.sanitizedBody,
+      req.files
     );
     res.status(200).json({ data: updated });
   } catch (error) {
