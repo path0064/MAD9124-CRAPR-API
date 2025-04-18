@@ -4,7 +4,10 @@ const crapService = require("../services/crap.js");
 
 const getAll = async (req, res, next) => {
   try {
-    let craps = await crapService.getAll(req.body);
+    const { query, distance, lat, long, show_taken } = req.query;
+    let craps = await crapService.getAll(
+      query || distance || lat || long || show_taken ? req.query : req.body
+    );
     res.status(200).json({ data: craps });
   } catch (error) {
     next(error);
@@ -13,7 +16,8 @@ const getAll = async (req, res, next) => {
 
 const getOne = async (req, res, next) => {
   try {
-    const foundCrap = await crapService.getOne(req.params.id);
+    const userId = req.user.id;
+    const foundCrap = await crapService.getOne(req.params.id, userId);
     res.status(200).json({ data: foundCrap });
   } catch (error) {
     next(error);
@@ -21,14 +25,14 @@ const getOne = async (req, res, next) => {
 };
 
 const getMine = async (req, res, next) => {
-  try{
-    const userId= req.user.id;
+  try {
+    const userId = req.user.id;
     const foundCrap = await crapService.getMine(userId);
     res.status(200).json({ data: foundCrap });
   } catch (error) {
     next(error);
   }
-}
+};
 
 const createOne = async (req, res, next) => {
   try {
@@ -125,7 +129,8 @@ const updateOne = async (req, res, next) => {
     req.sanitizedBody.owner = req.user.id;
     const updated = await crapService.updateOne(
       req.params.id,
-      req.sanitizedBody
+      req.sanitizedBody,
+      req.files
     );
     res.status(200).json({ data: updated });
   } catch (error) {
